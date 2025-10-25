@@ -1,0 +1,66 @@
+def add_time(start, duration,weekday=None):
+    time_format = start.split()
+    time = time_format[0]
+    start_format = time_format[1]
+    
+    start_time = time.split(':')
+    start_hour = start_time[0]
+    start_minute = start_time[1]
+    
+    time_format_d = duration.split(':')
+    duration_hour = time_format_d[0]
+    duration_minute = time_format_d[1]
+    validate_time(start_hour,start_minute,start_format,duration_hour,duration_minute)
+    if start_format == 'AM':
+        if int(start_hour) == 12:
+           start_hour = 0
+    elif start_format == 'PM' and int(start_hour) != 12:
+        start_hour = int(start_hour) +12
+    return calculate_time(start_hour, start_minute, duration_hour, duration_minute,weekday)
+        
+    
+def validate_time(start_hour,start_minute,start_format,duration_hour,duration_minute):
+    if int(start_hour) < 1 or int(start_hour) > 12:
+        raise ValueError('Invalid Time Input')
+    if start_format not in ['AM', 'PM']:
+        raise ValueError('Invalid Time Format')
+    if int(start_minute)>= 60 or int(start_minute) < 0 or int(duration_minute) < 0 or int(duration_minute) >= 60:
+        raise ValueError('Invalid Time Input')
+    if int(duration_hour) < 0:
+        raise ValueError('Invalid Time Input')
+
+def calculate_time(start_hour, start_minute, duration_hour, duration_minute,weekday=None):
+    new_minute = int(start_minute) + int(duration_minute)
+    new_hour = int(start_hour) + int(duration_hour)
+    if new_minute >= 60:
+        new_hour += 1
+        new_minute -= 60
+    n = new_hour // 24
+    new_hour = new_hour % 24
+    if new_hour == 0:
+        display_hour = 12
+        period = 'AM'
+    elif new_hour == 12:
+        display_hour = 12
+        period = 'PM'
+    elif new_hour < 12:
+        display_hour = new_hour
+        period = 'AM'
+    elif new_hour > 12:
+        display_hour = new_hour - 12
+        period = 'PM'
+    new_time = f'{display_hour}:{new_minute:02d} {period}'
+    if weekday:
+        days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+        weekday = weekday.lower().capitalize()
+        start_index = days.index(weekday)
+        new_day = days[(start_index + n) % 7]
+        new_time += f', {new_day}'
+    if n == 1:
+        new_time += ' (next day)'
+    elif n > 1:
+        new_time += f' ({n} days later)'
+    
+    return new_time
+
+print(add_time('11:59 AM','24:00'))
