@@ -1,0 +1,106 @@
+class Category:
+    def __init__(self,name):
+        self.name = name
+        self.ledger = []
+    def deposit(self, amount, description = ''):
+        self.ledger.append({'amount':amount, 'description':description})
+    def check_funds(self,amount):
+        total = 0
+        for records in self.ledger:
+            total += records['amount']
+        if total >= amount:
+            return True
+        else:
+            return False
+        
+    def withdraw(self,amount,description = ''):
+        if not self.check_funds(amount):
+            return False
+        self.ledger.append({'amount': -amount, 'description':description}) 
+        return True
+    def get_balance(self):
+        total_balance = 0
+        for record in self.ledger:
+            total_balance += record['amount']
+        return total_balance  
+    def transfer(self,amount,category):
+        if not self.check_funds(amount):
+            return False
+        self.ledger.append({'amount': -amount, 'description' : f'Transfer to {category.name}'}) 
+        category.ledger.append({'amount':amount, 'description': f'Transfer from {self.name}'})
+        return True
+    def __str__(self):
+        output = self.name.center(30, '*') + "\n"
+        for i in self.ledger:
+            desc = i['description'][:23].ljust(23)
+            amt = f"{i['amount']:.2f}".rjust(7)
+            output += desc + amt + "\n"
+        output += f"Total: {self.get_balance():.2f}"
+        return output
+food = Category('Food')
+food.deposit(4000, 'Initial Deposit:  ')
+food.withdraw(170, 'Groceries:  ')
+food.withdraw(200, 'Fancy Dining:   ')
+clothing = Category('Clothing')
+clothing.deposit(5000, 'Initial deposit')
+clothing.withdraw(250, 'School shopping   ')
+clothing.withdraw(100, 'Chistmas shopping   ')
+entertainment = Category('Entertainment')
+entertainment.deposit(8000, 'Initial deposit')
+entertainment.withdraw(700, 'Video games   ')
+entertainment.withdraw(1000, 'Crunchyroll Subscription    ')
+entertainment.withdraw(3000, 'Holiday   ')
+entertainment.withdraw(800, 'Movies   ')
+clothing.transfer(1000, entertainment)
+food.transfer(150, clothing )
+print(food)
+print(clothing)
+print(entertainment)
+
+            
+def create_spend_chart(categories):
+    total_spent = 0
+    spent_per_category = []
+
+    # Calculate spending per category
+    for category in categories:
+        spent = sum(-item['amount'] for item in category.ledger if item['amount'] < 0)
+        spent_per_category.append(spent)
+        total_spent += spent
+
+    # Calculate percentages rounded down to nearest 10
+    percentages = [int((spent / total_spent) * 100) // 10 * 10 for spent in spent_per_category]
+
+    # Build chart lines
+    chart = ["Percentage spent by category"]
+    for i in range(100, -1, -10):
+        line = str(i).rjust(3) + "|"
+        for percent in percentages:
+            if percent >= i:
+                line += " o "
+            else:
+                line += "   "
+        line += " "  # end space after last bar
+        chart.append(line)
+
+    # Horizontal line
+    chart.append("    " + "-" * (len(categories) * 3 + 1))
+
+    # Category names vertically
+    max_len = max(len(category.name) for category in categories)
+    for i in range(max_len):
+        name_line = "     "  # 5 spaces at start
+        for category in categories:
+            if i < len(category.name):
+                name_line += category.name[i] + "  "  # letter + 2 spaces
+            else:
+                name_line += "   "  # maintain spacing
+        chart.append(name_line)  # do not rstrip — keep trailing spaces
+
+    return "\n".join(chart)
+
+    
+print(create_spend_chart([food,clothing,entertainment]))
+chart_output = create_spend_chart([food, clothing, entertainment])
+for line in chart_output.split('\n'):
+    print(f'{len(line)} : {line}')
