@@ -1,0 +1,69 @@
+class Rectangle:
+    def __init__(self,width,height):
+        self.width = width
+        self.height = height
+    def set_width(self,new_width):
+        if not isinstance(new_width,(int,float)):
+            raise ValueError('Value must be a number')
+        else:
+            self.width = new_width
+    def set_height(self,new_height):
+        if not isinstance(new_height,(int,float)):
+            raise ValueError('Value must be a number')
+        else:
+            self.height = new_height
+    def get_area(self):
+        return self.width * self.height
+    def get_perimeter(self):
+        return (self.width + self.height)*2
+    def get_diagonal(self):
+        return ((self.width)**2+(self.height)**2)**0.5
+    def get_picture(self):
+        if self.width > 50 or self.height > 50:
+            return 'Too big for picture.'
+        picture = ''
+        line = '*' * self.width + '\n'
+        picture += line * self.height
+        return picture
+    def get_amount_inside(self,other_shape):
+        across = self.width // other_shape.width
+        down = self.height // other_shape.height
+        return across * down
+    def __str__(self):
+        output = f'Rectangle(width={self.width}, height={self.height})'
+        return output
+rect = Rectangle(10,10)
+rect2 = Rectangle(10,5)
+print(rect.get_area())
+print(rect.get_perimeter())
+print(rect.get_diagonal())
+print(rect.get_picture())
+print(rect)
+
+
+
+
+class Square(Rectangle):
+    def __init__(self,side):
+        self.width = side
+        self.height = side
+    def set_side(self,new_side):
+        if not isinstance(new_side,(int,float)):
+            raise ValueError('Value must be a number')
+        else:
+            self.width = new_side
+            self.height = new_side
+    def set_width(self, new_width):
+        self.set_side(new_width)
+
+    def set_height(self, new_height):
+        self.set_side(new_height)
+    def __str__(self):
+        output =f'Square(side={self.width})'
+        return output
+square = Square(9)
+print(square.get_area())
+square.set_side(5)
+print(square.get_area())
+print(square.get_picture())
+print(square)
