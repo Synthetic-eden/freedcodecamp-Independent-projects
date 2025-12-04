@@ -1,0 +1,49 @@
+import copy
+import random
+
+class Hat:
+    def __init__(self,**kwargs):
+        self.kwargs = kwargs
+        contents = []
+        for key,arg in kwargs.items():
+            contents.extend([key]*arg)
+        self.contents = contents
+    def draw(self,balls_to_draw):
+        if not isinstance(balls_to_draw,(int)):
+            raise ValueError('Balls to draw must be a whole number')
+        if balls_to_draw > len(self.contents):
+            drawn_balls = self.contents[:]
+            self.contents.clear()
+            return drawn_balls
+        else:
+            drawn_balls = random.sample(self.contents,balls_to_draw)
+            for ball in drawn_balls:
+                self.contents.remove(ball)  
+            return drawn_balls
+            
+def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
+    if not isinstance(num_balls_drawn, int) or not isinstance(num_experiments, int):
+        raise ValueError("Balls to draw and number of experiments must be whole numbers")
+    successes = 0
+    for experiment in range(0,num_experiments):
+        hat_copy = copy.deepcopy(hat)
+        exp_drawn_balls = hat_copy.draw(num_balls_drawn)
+        drawn_counts = {}
+        
+        for ball in exp_drawn_balls:
+            if ball in drawn_counts:
+                drawn_counts[ball] += 1
+            else:
+                drawn_counts[ball] = 1
+        success = all(drawn_counts.get(color, 0) >= count 
+              for color, count in expected_balls.items())
+        if success is True:
+            successes += 1
+    return successes/num_experiments
+hat = Hat(red = 2, blue= 7, yellow = 8)
+output = experiment(hat=hat,expected_balls = {"blue": 2, "red": 1},num_balls_drawn= 3, num_experiments=1000)
+print(output)
+
+        
+        
+    
